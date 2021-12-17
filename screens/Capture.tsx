@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { uploadImage } from "../utils/actions";
 
 const Capture = ({ navigation }) => {
   const [startCamera, setStartCamera] = React.useState(false);
@@ -29,14 +30,15 @@ const Capture = ({ navigation }) => {
     }
   };
   const __takePicture = async () => {
-    const photo: any = await camera.takePictureAsync();
-    console.log(photo);
+    const photo: any = await camera.takePictureAsync({ base64: true });
     setPreviewVisible(true);
     //setStartCamera(false)
     setCapturedImage(photo);
   };
   const __savePhoto = () => {
-    navigation.navigate("Result");
+    uploadImage(capturedImage).then((response) => {
+      navigation.navigate("Result", response);
+    });
   };
   const __retakePicture = () => {
     setCapturedImage(null);
@@ -212,7 +214,6 @@ const Capture = ({ navigation }) => {
 export default Capture;
 
 const CameraPreview = ({ photo, retakePicture, savePhoto }: any) => {
-  console.log("photo.....", photo);
   return (
     <View
       style={{
