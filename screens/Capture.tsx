@@ -10,6 +10,7 @@ import {
   View,
 } from "react-native";
 import { uploadImage } from "../utils/actions";
+import axios from "axios";
 
 const Capture = ({ navigation }) => {
   const [startCamera, setStartCamera] = React.useState(false);
@@ -18,6 +19,8 @@ const Capture = ({ navigation }) => {
   const [cameraType, setCameraType] = React.useState(
     Camera.Constants.Type.back
   );
+  const [url, setUrl] = React.useState(null);
+
   const [flashMode, setFlashMode] = React.useState("off");
   let camera: Camera;
   const __startCamera = async () => {
@@ -37,9 +40,31 @@ const Capture = ({ navigation }) => {
   };
   const __savePhoto = () => {
     uploadImage(capturedImage).then((response) => {
+      // console.log(response);
+      setUrl(response.url);
       navigation.navigate("Result", response);
     });
   };
+  function postUrl(url: string) {
+    const configurationObject = {
+      url: `http://localhost:5000/get-photo`,
+      method: "POST",
+      data: { url: url },
+    };
+
+    axios(configurationObject)
+      .then((response) => {
+        console.log(response)
+      })
+      .catch((error) => {
+        console.log(error, "An error has occurred");
+      });
+  }
+  React.useEffect(() => {
+    if (url !== null) {
+      postUrl(url);
+    }
+  }, [url]);
   const __retakePicture = () => {
     setCapturedImage(null);
     setPreviewVisible(false);
