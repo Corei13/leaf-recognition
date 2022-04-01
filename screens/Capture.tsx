@@ -1,323 +1,127 @@
-import { Camera } from "expo-camera";
-import * as React from "react";
-import {
-  Alert,
-  ImageBackground,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { uploadImage } from "../utils/actions";
-import axios from "axios";
 
-const Capture = ({ navigation }) => {
-  const [startCamera, setStartCamera] = React.useState(false);
-  const [previewVisible, setPreviewVisible] = React.useState(false);
-  const [capturedImage, setCapturedImage] = React.useState<any>(null);
-  const [cameraType, setCameraType] = React.useState(
-    Camera.Constants.Type.back
-  );
-  const [url, setUrl] = React.useState(null);
 
-  const [flashMode, setFlashMode] = React.useState("off");
-  let camera: Camera;
-  const __startCamera = async () => {
-    const { status } = await Camera.requestCameraPermissionsAsync();
-    console.log(status);
-    if (status === "granted") {
-      setStartCamera(true);
-    } else {
-      Alert.alert("Access denied");
+import * as ImagePicker from "expo-image-picker";
+import React, { useState } from "react";
+import { Button, Image, StyleSheet, View } from "react-native";
+
+const SERVER_URL = "http://192.168.0.126:6000";
+
+const App = ({ route, navigation }) => {
+  const [pickedImagePath, setPickedImagePath] = useState("");
+
+  const showImagePicker = async () => {
+    const permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("You've refused to allow this appp to access your photos!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setPickedImagePath(result.uri);
+      console.log(result);
     }
   };
-  const __takePicture = async () => {
-    const photo: any = await camera.takePictureAsync({ base64: true });
-    setPreviewVisible(true);
-    //setStartCamera(false)
-    setCapturedImage(photo);
-  };
-  const __savePhoto = () => {
-    uploadImage(capturedImage).then((response) => {
-      // console.log(response);
-      setUrl(response.url);
-      navigation.navigate("Result", response);
+
+  const openCamera = async () => {
+    const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("You've refused to allow this app to access your camera!");
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
     });
+
+    if (!result.cancelled) {
+      setPickedImagePath(result.uri);
+    }
   };
-  function postUrl(url: string) {
-    const configurationObject = {
-      url: `http://localhost:5000/get-photo`,
+
+  const handleUploadPhoto = () => {
+    console.log("route", route.params);
+    const { asstManageName, estateName, managerName, slot } = route.params;
+    const uriParts = pickedImagePath.split(".");
+    const fileType = uriParts[uriParts.length - 1];
+
+    let formData = new FormData();
+
+    formData.append("photo", {
+      uri: pickedImagePath,
+      name: `photo.${fileType}`,
+      type: `image/${fileType}`,
+    });
+
+    formData.append("asst_manage_name", asstManageName);
+    formData.append("estate_name", estateName);
+    formData.append("manager_name", managerName);
+    formData.append("slot", slot);
+
+    let options = {
       method: "POST",
-      data: { url: url },
+      body: formData,
     };
 
-    axios(configurationObject)
+    fetch(`${SERVER_URL}/analyze`, options)
+      .then((response) => response.json())
       .then((response) => {
-        console.log(response)
+        console.log("response", response);
+        if (response) {
+          navigation.navigate("Result", response.data);
+        }
       })
       .catch((error) => {
-        console.log(error, "An error has occurred");
+        console.log("error", error);
       });
-  }
-  React.useEffect(() => {
-    if (url !== null) {
-      postUrl(url);
-    }
-  }, [url]);
-  const __retakePicture = () => {
-    setCapturedImage(null);
-    setPreviewVisible(false);
-    __startCamera();
-  };
-  const __handleFlashMode = () => {
-    if (flashMode === "on") {
-      setFlashMode("off");
-    } else if (flashMode === "off") {
-      setFlashMode("on");
-    } else {
-      setFlashMode("auto");
-    }
-  };
-  const __switchCamera = () => {
-    if (cameraType === "back") {
-      setCameraType("front");
-    } else {
-      setCameraType("back");
-    }
   };
 
   return (
-    <View style={styles.container}>
-      {startCamera ? (
-        <View
-          style={{
-            flex: 1,
-            width: "100%",
-          }}
-        >
-          {previewVisible && capturedImage ? (
-            <CameraPreview
-              photo={capturedImage}
-              savePhoto={__savePhoto}
-              retakePicture={__retakePicture}
-            />
-          ) : (
-            <Camera
-              type={cameraType}
-              flashMode={flashMode}
-              style={{ flex: 1 }}
-              ref={(r) => {
-                camera = r;
-              }}
-            >
-              <View
-                style={{
-                  flex: 1,
-                  width: "100%",
-                  backgroundColor: "transparent",
-                  flexDirection: "row",
-                }}
-              >
-                <View
-                  style={{
-                    position: "absolute",
-                    left: "5%",
-                    top: "10%",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={__handleFlashMode}
-                    // style={{
-                    //   backgroundColor: flashMode === "off" ? "#000" : "#fff",
-                    //   borderRadius: "50%",
-                    //   height: 25,
-                    //   width: 25,
-                    // }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 20,
-                      }}
-                    >
-                      ⚡️
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={__switchCamera}
-                    // style={{
-                    //   marginTop: 20,
-                    //   borderRadius: "50%",
-                    //   height: 25,
-                    //   width: 25,
-                    // }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 20,
-                      }}
-                    >
-                      {cameraType === "front" ? "🤳" : "📷"}
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-                <View
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    flexDirection: "row",
-                    flex: 1,
-                    width: "100%",
-                    padding: 20,
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <View
-                    style={{
-                      alignSelf: "center",
-                      flex: 1,
-                      alignItems: "center",
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={__takePicture}
-                      style={{
-                        width: 70,
-                        height: 70,
-                        bottom: 0,
-                        borderRadius: 50,
-                        backgroundColor: "#fff",
-                      }}
-                    />
-                  </View>
-                </View>
-              </View>
-            </Camera>
-          )}
-        </View>
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: "#fff",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <TouchableOpacity
-            onPress={__startCamera}
-            style={{
-              width: 130,
-              borderRadius: 4,
-              backgroundColor: "#14274e",
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              height: 40,
-            }}
-          >
-            <Text
-              style={{
-                color: "#fff",
-                fontWeight: "bold",
-                textAlign: "center",
-              }}
-            >
-              Take picture
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
+    <View style={styles.screen}>
+      <View style={styles.buttonContainer}>
+        <Button onPress={showImagePicker} title="Select an image" />
+        <Button onPress={openCamera} title="Open camera" />
+      </View>
 
-      <StatusBar style="auto" />
+      <View style={styles.imageContainer}>
+        {pickedImagePath !== "" && (
+          <Image source={{ uri: pickedImagePath }} style={styles.image} />
+        )}
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button onPress={handleUploadPhoto} title="Analyze" />
+      </View>
     </View>
   );
 };
 
-export default Capture;
-
-const CameraPreview = ({ photo, retakePicture, savePhoto }: any) => {
-  return (
-    <View
-      style={{
-        backgroundColor: "transparent",
-        flex: 1,
-        width: "100%",
-        height: "100%",
-      }}
-    >
-      <ImageBackground
-        source={{ uri: photo && photo.uri }}
-        style={{
-          flex: 1,
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "column",
-            padding: 15,
-            justifyContent: "flex-end",
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <TouchableOpacity
-              onPress={retakePicture}
-              style={{
-                width: 130,
-                height: 40,
-
-                alignItems: "center",
-                borderRadius: 4,
-              }}
-            >
-              <Text
-                style={{
-                  color: "#fff",
-                  fontSize: 20,
-                }}
-              >
-                Re-take
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={savePhoto}
-              style={{
-                width: 130,
-                height: 40,
-
-                alignItems: "center",
-                borderRadius: 4,
-              }}
-            >
-              <Text
-                style={{
-                  color: "#fff",
-                  fontSize: 20,
-                }}
-              >
-                Analysis photo
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ImageBackground>
-    </View>
-  );
-};
+export default App;
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  buttonContainer: {
+    width: 400,
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  imageContainer: {
+    padding: 30,
+  },
+  image: {
+    width: 400,
+    height: 300,
+    resizeMode: "cover",
   },
 });

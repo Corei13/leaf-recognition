@@ -1,79 +1,46 @@
+import Airtable from "airtable";
+import moment from "moment";
 import * as React from "react";
 import { ScrollView, StyleSheet } from "react-native";
 import { ListItem } from "react-native-elements";
 
-const list = [
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-  {
-    name: "01 January 21",
-    subtitle: "Habibur State, slot 02",
-  },
-];
+const base = new Airtable({ apiKey: "keysdvFSVMD8PvvPE" }).base(
+  "appb7gS3ne4YyBIf4"
+);
 
 const AllResults = ({ navigation }) => {
-  const handleOnListItemPress = (i: number) => {
+  const [list, setList] = React.useState([]);
+  React.useEffect(() => {
+    base("results")
+      .select({ view: "Grid view" })
+      .eachPage((records, fetchNextPage) => {
+        const result = [];
+        console.log(records.map((record) => record.fields));
+        setList(records.map((record) => record.fields));
+        fetchNextPage();
+      });
+    base("updates")
+      .select({ view: "Grid view" })
+      .eachPage((records, fetchNextPage) => {
+        console.log(records);
+        fetchNextPage();
+      });
+  }, []);
+
+  const handleOnListItemPress = (item: any) => {
     console.log("click");
-    navigation.navigate("Result");
+    navigation.navigate("Result", item);
   };
 
   return (
     <ScrollView>
-      {list.map((l, i) => (
-        <ListItem key={i} onPress={() => handleOnListItemPress(i)}>
+      {list.map((item, i) => (
+        <ListItem key={i} onPress={() => handleOnListItemPress(item)}>
           <ListItem.Content>
-            <ListItem.Title>{l.name}</ListItem.Title>
-            <ListItem.Subtitle>{l.subtitle}</ListItem.Subtitle>
+            <ListItem.Title>
+              {moment(item.Created).format("MMMM Do YYYY, h:mm:ss a")}
+            </ListItem.Title>
+            <ListItem.Subtitle>{item.estate_name}</ListItem.Subtitle>
           </ListItem.Content>
           <ListItem.Chevron />
         </ListItem>
