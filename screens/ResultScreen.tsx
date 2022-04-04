@@ -26,25 +26,23 @@ const ResultScreen = ({ route }) => {
   const [imageUrl, setImageUrl] = React.useState(undefined);
   const {
     Created,
-    analyzed_results,
     asst_manage_name,
     estate_name,
     manager_name,
     slot,
+    img_url,
+    type1,
+    value1,
+    type2,
+    value2,
+    type3,
+    value3,
   } = route.params;
-  console.log(Array.from(route.params.analyzed_results));
+
   React.useEffect(() => {
     const storage = getStorage();
-    getDownloadURL(
-      ref(
-        storage,
-        "https://storage.googleapis.com/tea-leaf-86440.appspot.com//home/shakil/recruits/p-tea/leaf-recognition-api/temp/277519537_5568072976540766_4263385999536309196_n.jpg"
-      )
-    )
+    getDownloadURL(ref(storage, img_url))
       .then((url) => {
-        // `url` is the download URL for 'images/stars.jpg'
-
-        // This can be downloaded directly:
         const xhr = new XMLHttpRequest();
         xhr.responseType = "blob";
         xhr.onload = (event) => {
@@ -52,28 +50,13 @@ const ResultScreen = ({ route }) => {
         };
         xhr.open("GET", url);
         xhr.send();
-
+        setImageUrl(url);
         console.log(url);
       })
       .catch((error) => {
         console.log(error);
-        // Handle any errors
+        // fail silently
       });
-
-    // const starsRef = ref(
-    //   storage,
-    //   "277519537_5568072976540766_4263385999536309196_n.jpg"
-    // );
-    // getDownloadURL(
-    //   ref(storage, "temp/277519537_5568072976540766_4263385999536309196_n.jpg")
-    // )
-    //   .then((url) => {
-    //     console.log(url);
-    //     // Insert url into an <img> tag to "download"
-    //   })
-    //   .catch((error) => {
-    //     console.log(error);
-    //   });
   }, []);
 
   return (
@@ -82,19 +65,25 @@ const ResultScreen = ({ route }) => {
         placeholderStyle={{}}
         transitionDuration={1000}
         source={{
-          uri: "https://storage.googleapis.com/tea-leaf-86440.appspot.com//home/shakil/recruits/p-tea/leaf-recognition-api/temp/277519537_5568072976540766_4263385999536309196_n.jpg",
+          uri: imageUrl,
         }}
-        style={{ height: 200, width: Dimensions.get("window").width }}
+        style={{ height: 300, width: Dimensions.get("window").width }}
       />
 
       <View style={styles.container}>
-        <View style={{ paddingBottom: 10 }}>
+        <View>
           <Card>
-            <Text>Estate Name: {estate_name}</Text>
-            <Text>Manager Name: {manager_name}</Text>
-            <Text>Asst. Manage Name: {asst_manage_name}</Text>
-            <Text>Slot: {slot}</Text>
-            <Text>
+            <Text style={{ textAlign: "center" }}>
+              Estate Name: {estate_name}
+            </Text>
+            <Text style={{ textAlign: "center" }}>
+              Manager Name: {manager_name}
+            </Text>
+            <Text style={{ textAlign: "center" }}>
+              Asst. Manage Name: {asst_manage_name}
+            </Text>
+            <Text style={{ textAlign: "center" }}>Slot: {slot}</Text>
+            <Text style={{ textAlign: "center" }}>
               Created: {moment(Created).format("MMMM Do YYYY, h:mm:ss a")}
             </Text>
           </Card>
@@ -112,7 +101,7 @@ const ResultScreen = ({ route }) => {
             status="success"
             textProps={{}}
             textStyle={{ color: "black" }}
-            value="Two & Half : 8.5"
+            value={`${type1} : ${value1}`}
           />
         </View>
         <View style={{ flexDirection: "row" }}>
@@ -122,7 +111,7 @@ const ResultScreen = ({ route }) => {
             status="warning"
             textProps={{}}
             textStyle={{ color: "black" }}
-            value="four & Half : 4.5"
+            value={`${type2} : ${value2}`}
           />
         </View>
         <View style={{ flexDirection: "row" }}>
@@ -132,7 +121,7 @@ const ResultScreen = ({ route }) => {
             status="error"
             textProps={{}}
             textStyle={{ color: "black" }}
-            value="Seven & Half : 0.5"
+            value={`${type3} : ${value3}`}
           />
         </View>
       </View>

@@ -14,7 +14,6 @@ const AllResults = ({ navigation }) => {
     base("results")
       .select({ view: "Grid view" })
       .eachPage((records, fetchNextPage) => {
-        const result = [];
         console.log(records.map((record) => record.fields));
         setList(records.map((record) => record.fields));
         fetchNextPage();
