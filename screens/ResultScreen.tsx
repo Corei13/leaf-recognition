@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import moment from "moment";
 import * as React from "react";
-import { Dimensions, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Dimensions, StyleSheet, View } from "react-native";
 import { Badge, Card, Image, Text } from "react-native-elements";
 
 // Initialize Firebase
@@ -61,17 +61,23 @@ const ResultScreen = ({ route }) => {
 
   return (
     <View style={styles.container}>
-      <Image
-        placeholderStyle={{}}
-        transitionDuration={1000}
-        source={{
-          uri: imageUrl,
-        }}
-        style={{ height: 300, width: Dimensions.get("window").width }}
-      />
+      {imageUrl !== undefined ? (
+        <Image
+          placeholderStyle={{}}
+          transitionDuration={1000}
+          source={{
+            uri: imageUrl,
+          }}
+          style={{ height: 300, width: Dimensions.get("window").width }}
+        />
+      ) : (
+        <View style={styles.container}>
+          <ActivityIndicator size="large" />
+        </View>
+      )}
 
       <View style={styles.container}>
-        <View>
+        <View style={{ paddingBottom: 10 }}>
           <Card>
             <Text style={{ textAlign: "center" }}>
               Estate Name: {estate_name}

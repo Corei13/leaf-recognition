@@ -1,13 +1,18 @@
-
-
 import * as ImagePicker from "expo-image-picker";
 import React, { useState } from "react";
-import { Button, Image, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  Button,
+  Image,
+  StyleSheet,
+  View,
+} from "react-native";
 
 const SERVER_URL = "http://192.168.0.126:6000";
 
 const App = ({ route, navigation }) => {
   const [pickedImagePath, setPickedImagePath] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const showImagePicker = async () => {
     const permissionResult =
@@ -48,7 +53,7 @@ const App = ({ route, navigation }) => {
   };
 
   const handleUploadPhoto = () => {
-    console.log("route", route.params);
+    setLoading(true);
     const { asstManageName, estateName, managerName, slot } = route.params;
     const uriParts = pickedImagePath.split(".");
     const fileType = uriParts[uriParts.length - 1];
@@ -76,29 +81,36 @@ const App = ({ route, navigation }) => {
       .then((response) => {
         console.log("response", response);
         if (response) {
+          setLoading(false);
           navigation.navigate("Result", response.data);
         }
       })
       .catch((error) => {
+        setLoading(false);
         console.log("error", error);
       });
   };
 
   return (
     <View style={styles.screen}>
-      <View style={styles.buttonContainer}>
-        <Button onPress={showImagePicker} title="Select an image" />
-        <Button onPress={openCamera} title="Open camera" />
-      </View>
-
-      <View style={styles.imageContainer}>
-        {pickedImagePath !== "" && (
-          <Image source={{ uri: pickedImagePath }} style={styles.image} />
-        )}
-      </View>
-      <View style={styles.buttonContainer}>
-        <Button onPress={handleUploadPhoto} title="Analyze" />
-      </View>
+      {loading ? (
+        <ActivityIndicator size="large" />
+      ) : (
+        <>
+          <View style={styles.buttonContainer}>
+            <Button onPress={showImagePicker} title="Select an image" />
+            <Button onPress={openCamera} title="Open camera" />
+          </View>
+          <View style={styles.imageContainer}>
+            {pickedImagePath !== "" && (
+              <Image source={{ uri: pickedImagePath }} style={styles.image} />
+            )}
+          </View>
+          <View style={styles.buttonContainer}>
+            <Button onPress={handleUploadPhoto} title="Analyze" />
+          </View>
+        </>
+      )}
     </View>
   );
 };
