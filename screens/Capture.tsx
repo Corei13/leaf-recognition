@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 
-const SERVER_URL = "http://192.168.0.126:6000";
+const SERVER_URL = "https://tea-leaf-api-hf2pexin3a-el.a.run.app";
 
 const App = ({ route, navigation }) => {
   const [pickedImagePath, setPickedImagePath] = useState("");
@@ -94,7 +94,7 @@ const App = ({ route, navigation }) => {
   return (
     <View style={styles.screen}>
       {loading ? (
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color="#000000" />
       ) : (
         <>
           <View style={styles.buttonContainer}>
@@ -107,7 +107,11 @@ const App = ({ route, navigation }) => {
             )}
           </View>
           <View style={styles.buttonContainer}>
-            <Button onPress={handleUploadPhoto} title="Analyze" />
+            <Button
+              onPress={handleUploadPhoto}
+              title="Analyze"
+              disabled={pickedImagePath.trim().length < 1 ? true : false}
+            />
           </View>
         </>
       )}

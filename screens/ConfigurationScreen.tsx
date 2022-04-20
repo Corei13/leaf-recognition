@@ -4,11 +4,11 @@ import { Button, Input } from "react-native-elements";
 import { View } from "../components/Themed";
 
 const ConfigurationScreen = ({ navigation }) => {
-  const [estateName, setEstateName] = React.useState<string>();
-  const [managerName, setManagerName] = React.useState<string>();
-  const [asstManageName, setAsstManagerName] = React.useState<string>();
-  const [slot, setSlot] = React.useState<string>();
-  
+  const [estateName, setEstateName] = React.useState<string>("");
+  const [managerName, setManagerName] = React.useState<string>("");
+  const [asstManageName, setAsstManagerName] = React.useState<string>("");
+  const [slot, setSlot] = React.useState<string>("");
+
   const onSubmitPress = () => {
     navigation.navigate("Cam", {
       estateName,
@@ -47,6 +47,14 @@ const ConfigurationScreen = ({ navigation }) => {
 
       <Button
         title="Submit"
+        disabled={
+          estateName.trim().length < 1 ||
+          managerName.trim().length < 1 ||
+          asstManageName.trim().length < 1 ||
+          slot.trim().length < 1
+            ? true
+            : false
+        }
         buttonStyle={{ backgroundColor: "#2D5A27" }}
         onPress={() => onSubmitPress()}
       />

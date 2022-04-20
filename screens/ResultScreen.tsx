@@ -7,13 +7,13 @@ import { Badge, Card, Image, Text } from "react-native-elements";
 
 // Initialize Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyAysUbQfB-e1_1tLbFbSJY3n5HUvncFdJw",
-  authDomain: "tea-leaf-86440.firebaseapp.com",
-  projectId: "tea-leaf-86440",
-  storageBucket: "tea-leaf-86440.appspot.com", //gs://tea-leaf-86440.appspot.com
-  messagingSenderId: "66787787137",
-  appId: "1:66787787137:web:44454aa28863b54902e880",
-  measurementId: "G-2ZEY295EN6",
+  apiKey: "AIzaSyC6M4sKRJ4fyZP0WNZsbD7Ulhme12EWU-U",
+  authDomain: "aracadia-leaf-analysis.firebaseapp.com",
+  projectId: "aracadia-leaf-analysis",
+  storageBucket: "aracadia-leaf-analysis.appspot.com",
+  messagingSenderId: "23868285272",
+  appId: "1:23868285272:web:ddd7ed1d70a0cd6a5a452d",
+  measurementId: "G-C03J3B6B03",
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
@@ -38,6 +38,27 @@ const ResultScreen = ({ route }) => {
     type3,
     value3,
   } = route.params;
+
+  const mapTypedValue = (type: string) => {
+    switch (type) {
+      case "x":
+        return "Damaged";
+      case "sb":
+        return "Soft Bungee";
+      case "hb":
+        return "Hard Bungee";
+      case "1.5":
+        return "One & Half";
+      case "2.5":
+        return "Two & Half";
+      case "3.5":
+        return "Three & Half";
+      case "4.5":
+        return "Four & Half";
+      case "5.5":
+        return "Five & Half";
+    }
+  };
 
   React.useEffect(() => {
     const storage = getStorage();
@@ -72,7 +93,7 @@ const ResultScreen = ({ route }) => {
         />
       ) : (
         <View style={styles.container}>
-          <ActivityIndicator size="large" />
+          <ActivityIndicator size="large" color="#000000" />
         </View>
       )}
 
@@ -80,17 +101,24 @@ const ResultScreen = ({ route }) => {
         <View style={{ paddingBottom: 10 }}>
           <Card>
             <Text style={{ textAlign: "center" }}>
-              Estate Name: {estate_name}
+              <Text style={{ fontWeight: "bold" }}>Estate Name:</Text>{" "}
+              {estate_name}
             </Text>
             <Text style={{ textAlign: "center" }}>
-              Manager Name: {manager_name}
+              <Text style={{ fontWeight: "bold" }}> Manager Name:</Text>{" "}
+              {manager_name}
             </Text>
             <Text style={{ textAlign: "center" }}>
-              Asst. Manage Name: {asst_manage_name}
+              <Text style={{ fontWeight: "bold" }}> Asst. Manage Name:</Text>{" "}
+              {asst_manage_name}
             </Text>
-            <Text style={{ textAlign: "center" }}>Slot: {slot}</Text>
             <Text style={{ textAlign: "center" }}>
-              Created: {moment(Created).format("MMMM Do YYYY, h:mm:ss a")}
+              <Text style={{ fontWeight: "bold" }}> Slot: </Text>
+              {slot}
+            </Text>
+            <Text style={{ textAlign: "center" }}>
+              <Text style={{ fontWeight: "bold" }}> Created: </Text>
+              {moment(Created).format("MMMM Do YYYY, h:mm:ss a")}
             </Text>
           </Card>
         </View>
@@ -99,6 +127,7 @@ const ResultScreen = ({ route }) => {
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
+            paddingBottom: 10,
           }}
         >
           <Badge
@@ -107,27 +136,27 @@ const ResultScreen = ({ route }) => {
             status="success"
             textProps={{}}
             textStyle={{ color: "black" }}
-            value={`${type1} : ${value1}`}
+            value={`${mapTypedValue(type1)} : ${value1 + "%"}`}
           />
         </View>
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", paddingBottom: 10 }}>
           <Badge
             badgeStyle={{ width: 200, height: 50 }}
             containerStyle={{}}
             status="warning"
             textProps={{}}
             textStyle={{ color: "black" }}
-            value={`${type2} : ${value2}`}
+            value={`${mapTypedValue(type2)} : ${value2 + "%"}`}
           />
         </View>
-        <View style={{ flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", paddingBottom: 10 }}>
           <Badge
             badgeStyle={{ width: 200, height: 50 }}
             containerStyle={{}}
             status="error"
             textProps={{}}
             textStyle={{ color: "black" }}
-            value={`${type3} : ${value3}`}
+            value={`${mapTypedValue(type3)} : ${value3 + "%"}`}
           />
         </View>
       </View>

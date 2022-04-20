@@ -45,13 +45,13 @@ const AllResults = ({ navigation }) => {
           paddingRight: 10,
         }}
       >
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color="#000000" />
       </View>
     );
   } else {
     return (
       <ScrollView>
-        {list.map((item, i) => (
+        {list.reverse().map((item, i) => (
           <ListItem key={i} onPress={() => handleOnListItemPress(item)}>
             <ListItem.Content>
               <ListItem.Title>

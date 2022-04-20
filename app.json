@@ -7,11 +7,7 @@
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/images/splash",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -26,7 +22,9 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.recruit.leafRecognition",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
