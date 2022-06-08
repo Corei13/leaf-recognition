@@ -31,33 +31,25 @@ const ResultScreen = ({ route }) => {
     manager_name,
     slot,
     img_url,
-    type1,
-    value1,
-    type2,
-    value2,
-    type3,
-    value3,
+    resultArr,
   } = route.params;
 
-  const mapTypedValue = (type: string) => {
-    switch (type) {
-      case "x":
-        return "Damaged";
-      case "sb":
-        return "Soft Bungee";
-      case "hb":
-        return "Hard Bungee";
-      case "1.5":
-        return "One & Half";
-      case "2.5":
-        return "Two & Half";
-      case "3.5":
-        return "Three & Half";
-      case "4.5":
-        return "Four & Half";
-      case "5.5":
-        return "Five & Half";
-    }
+  const calculateResultSummery = (resultArr: any, type: any) => {
+    console.log(resultArr, "resultArr");
+    let sum = 0;
+    let totalSum = 0;
+    resultArr.forEach((res: any, index: any) => {
+      sum = sum + res[1.5];
+      Object.entries(res).forEach(([key, value]) => {
+        console.log(value);
+        totalSum = totalSum + value;
+        if (key === type) {
+          sum = sum + value;
+        }
+      });
+    });
+
+    return parseInt((sum / totalSum) * 100);
   };
 
   React.useEffect(() => {
@@ -81,7 +73,7 @@ const ResultScreen = ({ route }) => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View>
       {imageUrl !== undefined ? (
         <Image
           placeholderStyle={{}}
@@ -89,16 +81,16 @@ const ResultScreen = ({ route }) => {
           source={{
             uri: imageUrl,
           }}
-          style={{ height: 300, width: Dimensions.get("window").width }}
+          style={{ height: 220, width: Dimensions.get("window").width }}
         />
       ) : (
-        <View style={styles.container}>
+        <View>
           <ActivityIndicator size="large" color="#000000" />
         </View>
       )}
 
-      <View style={styles.container}>
-        <View style={{ paddingBottom: 10 }}>
+      <View>
+        <View style={{ paddingBottom: 5 }}>
           <Card>
             <Text style={{ textAlign: "center" }}>
               <Text style={{ fontWeight: "bold" }}>Estate Name:</Text>{" "}
@@ -131,32 +123,135 @@ const ResultScreen = ({ route }) => {
           }}
         >
           <Badge
-            badgeStyle={{ width: 200, height: 50 }}
+            badgeStyle={{ width: 200, height: 30 }}
             containerStyle={{}}
             status="success"
             textProps={{}}
             textStyle={{ color: "black" }}
-            value={`${mapTypedValue(type1)} : ${value1 + "%"}`}
+            value={"One and Half : " + calculateResultSummery(resultArr, "1.5")}
           />
         </View>
-        <View style={{ flexDirection: "row", paddingBottom: 10 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingBottom: 10,
+          }}
+        >
           <Badge
-            badgeStyle={{ width: 200, height: 50 }}
+            badgeStyle={{ width: 200, height: 30 }}
             containerStyle={{}}
-            status="warning"
+            status="success"
             textProps={{}}
             textStyle={{ color: "black" }}
-            value={`${mapTypedValue(type2)} : ${value2 + "%"}`}
+            value={"Two and Half : " + calculateResultSummery(resultArr, "2.5")}
           />
         </View>
-        <View style={{ flexDirection: "row", paddingBottom: 10 }}>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingBottom: 10,
+          }}
+        >
           <Badge
-            badgeStyle={{ width: 200, height: 50 }}
+            badgeStyle={{ width: 200, height: 30 }}
             containerStyle={{}}
-            status="error"
+            status="success"
             textProps={{}}
             textStyle={{ color: "black" }}
-            value={`${mapTypedValue(type3)} : ${value3 + "%"}`}
+            value={
+              "Three and Half : " + calculateResultSummery(resultArr, "3.5")
+            }
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingBottom: 10,
+          }}
+        >
+          <Badge
+            badgeStyle={{ width: 200, height: 30 }}
+            containerStyle={{}}
+            status="success"
+            textProps={{}}
+            textStyle={{ color: "black" }}
+            value={
+              "Four and Half : " + calculateResultSummery(resultArr, "4.5")
+            }
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingBottom: 10,
+          }}
+        >
+          <Badge
+            badgeStyle={{ width: 200, height: 30 }}
+            containerStyle={{}}
+            status="success"
+            textProps={{}}
+            textStyle={{ color: "black" }}
+            value={"Five and Half :" + calculateResultSummery(resultArr, "5.5")}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingBottom: 10,
+          }}
+        >
+          <Badge
+            badgeStyle={{ width: 200, height: 30 }}
+            containerStyle={{}}
+            status="success"
+            textProps={{}}
+            textStyle={{ color: "black" }}
+            value={"Soft Bungee : " + calculateResultSummery(resultArr, "sb")}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingBottom: 10,
+          }}
+        >
+          <Badge
+            badgeStyle={{ width: 200, height: 30 }}
+            containerStyle={{}}
+            status="success"
+            textProps={{}}
+            textStyle={{ color: "black" }}
+            value={"Hard Bungee : " + calculateResultSummery(resultArr, "hb")}
+          />
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            paddingBottom: 5,
+          }}
+        >
+          <Badge
+            badgeStyle={{ width: 200, height: 30 }}
+            containerStyle={{}}
+            status="success"
+            textProps={{}}
+            textStyle={{ color: "black" }}
+            value={"Damaged : " + calculateResultSummery(resultArr, "x")}
           />
         </View>
       </View>

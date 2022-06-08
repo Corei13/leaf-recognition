@@ -1,4 +1,6 @@
 import Airtable from "airtable";
+import { initializeApp } from "firebase/app";
+import { collection, getDocs, getFirestore } from "firebase/firestore/lite";
 import moment from "moment";
 import * as React from "react";
 import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
@@ -7,30 +9,39 @@ import { ListItem } from "react-native-elements";
 const base = new Airtable({ apiKey: "keysdvFSVMD8PvvPE" }).base(
   "appb7gS3ne4YyBIf4"
 );
+const firebaseConfig = {
+  apiKey: "AIzaSyC6M4sKRJ4fyZP0WNZsbD7Ulhme12EWU-U",
+  authDomain: "aracadia-leaf-analysis.firebaseapp.com",
+  projectId: "aracadia-leaf-analysis",
+  storageBucket: "aracadia-leaf-analysis.appspot.com",
+  messagingSenderId: "23868285272",
+  appId: "1:23868285272:web:ddd7ed1d70a0cd6a5a452d",
+  measurementId: "G-C03J3B6B03",
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const AllResults = ({ navigation }) => {
-  const [list, setList] = React.useState([]);
+  const [list, setList] = React.useState<object[]>([]);
   const [loading, setLoading] = React.useState(false);
-  React.useEffect(() => {
+
+  const fetchResult = async () => {
     setLoading(true);
-    base("results")
-      .select({ view: "Grid view" })
-      .eachPage((records, fetchNextPage) => {
-        console.log(records.map((record) => record.fields));
-        setList(records.map((record) => record.fields));
-        setLoading(false);
-        fetchNextPage();
-      });
-    base("updates")
-      .select({ view: "Grid view" })
-      .eachPage((records, fetchNextPage) => {
-        console.log(records);
-        fetchNextPage();
-      });
+    const colls = collection(db, "results");
+    const resultSnapshot = await getDocs(colls);
+    const results = resultSnapshot.docs.map((doc) => doc.data());
+    setList(results);
+    console.log(results);
+    setLoading(false);
+  };
+
+  React.useEffect(() => {
+    fetchResult();
   }, []);
 
   const handleOnListItemPress = (item: any) => {
-    console.log("click");
+    console.log(item, "item");
     navigation.navigate("Result", item);
   };
 
@@ -55,6 +66,7 @@ const AllResults = ({ navigation }) => {
           <ListItem key={i} onPress={() => handleOnListItemPress(item)}>
             <ListItem.Content>
               <ListItem.Title>
+                {i + 1} :{" "}
                 {moment(item.Created).format("MMMM Do YYYY, h:mm:ss a")}
               </ListItem.Title>
               <ListItem.Subtitle>{item.estate_name}</ListItem.Subtitle>

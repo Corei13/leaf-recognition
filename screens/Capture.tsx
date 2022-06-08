@@ -8,11 +8,13 @@ import {
   View,
 } from "react-native";
 
-const SERVER_URL = "https://tea-leaf-api-hf2pexin3a-el.a.run.app";
-
+const SERVER_URL = "https://tea-backup-hf2pexin3a-em.a.run.app";
+// const SERVER_URL = "https://localhost:5000";
 const App = ({ route, navigation }) => {
   const [pickedImagePath, setPickedImagePath] = useState("");
   const [loading, setLoading] = useState(false);
+  const [imageWidth, setImageWidth] = useState(0);
+  const [imageHeight, setImageHeight] = useState(0);
 
   const showImagePicker = async () => {
     const permissionResult =
@@ -23,14 +25,14 @@ const App = ({ route, navigation }) => {
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-    });
+    const result = await ImagePicker.launchImageLibraryAsync();
 
-    console.log(result);
+    console.log(result, "image result");
 
     if (!result.cancelled) {
       setPickedImagePath(result.uri);
+      setImageWidth(result.width);
+      setImageHeight(result.height);
       console.log(result);
     }
   };
@@ -43,9 +45,7 @@ const App = ({ route, navigation }) => {
       return;
     }
 
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-    });
+    const result = await ImagePicker.launchCameraAsync();
 
     if (!result.cancelled) {
       setPickedImagePath(result.uri);
@@ -54,15 +54,16 @@ const App = ({ route, navigation }) => {
 
   const handleUploadPhoto = () => {
     setLoading(true);
-    const { asstManageName, estateName, managerName, slot } = route.params;
+    const { asstManageName, estateName, managerName, slot, mode, type } =
+      route.params;
     const uriParts = pickedImagePath.split(".");
     const fileType = uriParts[uriParts.length - 1];
-
+    console.log(uriParts, "~~~>");
     let formData = new FormData();
 
     formData.append("photo", {
       uri: pickedImagePath,
-      name: `photo.${fileType}`,
+      name: `${String(new Date())}.${fileType}`,
       type: `image/${fileType}`,
     });
 
@@ -70,6 +71,8 @@ const App = ({ route, navigation }) => {
     formData.append("estate_name", estateName);
     formData.append("manager_name", managerName);
     formData.append("slot", slot);
+    formData.append("mode", mode);
+    formData.append("type", type);
 
     let options = {
       method: "POST",
@@ -82,7 +85,9 @@ const App = ({ route, navigation }) => {
         console.log("response", response);
         if (response) {
           setLoading(false);
-          navigation.navigate("Result", response.data);
+          if (mode === "multiple") {
+            navigation.navigate("Result", response.data);
+          }
         }
       })
       .catch((error) => {
@@ -98,16 +103,28 @@ const App = ({ route, navigation }) => {
       ) : (
         <>
           <View style={styles.buttonContainer}>
-            <Button onPress={showImagePicker} title="Select an image" />
-            <Button onPress={openCamera} title="Open camera" />
+            <Button
+              color="#2D5A27"
+              onPress={showImagePicker}
+              title="Select an image"
+            />
+            <Button color="#2D5A27" onPress={openCamera} title="Open camera" />
           </View>
           <View style={styles.imageContainer}>
             {pickedImagePath !== "" && (
-              <Image source={{ uri: pickedImagePath }} style={styles.image} />
+              <Image
+                source={{ uri: pickedImagePath }}
+                style={{
+                  width: 500,
+                  height: 500,
+                  resizeMode: "contain",
+                }}
+              />
             )}
           </View>
           <View style={styles.buttonContainer}>
             <Button
+              color="#2D5A27"
               onPress={handleUploadPhoto}
               title="Analyze"
               disabled={pickedImagePath.trim().length < 1 ? true : false}
@@ -137,7 +154,7 @@ const styles = StyleSheet.create({
   },
   image: {
     width: 400,
-    height: 300,
+    height: 500,
     resizeMode: "cover",
   },
 });
